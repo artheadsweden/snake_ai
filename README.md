@@ -72,9 +72,9 @@ Some examples
 ###### All Values Together
 If we put all these values together we can get something like this
 
-[1, 1, 0,
+`[1, 1, 0,
  0, 1, 0, 0,
- 1, 0, 1, 0]
+ 1, 0, 1, 0]`
 
  As we can see, we got 11 values. These can be interpreted as:
 
