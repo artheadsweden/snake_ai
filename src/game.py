@@ -1,7 +1,7 @@
 import pygame
 from enum import Enum
 import random
-# import numpy as np
+
 
 # Constants
 BLOCK_SIZE = 20
@@ -124,7 +124,6 @@ class SnakeGame:
            point.y > self.height - BLOCK_SIZE or \
            point.y < 0
 
-
     def _update_ui(self):
         self.display.fill(BLACK)
 
@@ -177,10 +176,6 @@ class SnakeGame:
 
         # 6. Return game state
         return False
-
-    # def _within_one(self):
-    #     return abs(self.head.x - self.food.x) == 1 or abs(self.head.y - self.food.y) == 1
-
 
     @staticmethod
     def human_play():
