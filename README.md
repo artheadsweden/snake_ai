@@ -1,90 +1,98 @@
 ##Snake Game
 
-####The step1 Branch
-The first thing we need to do is to setup the game to be able to be played by the AI.
+####Coding of the AI
+Now we can get started with the coding the actual AI.
 
-####Additions to the SnakeGame Class
-Open the game.py file. We already have a method called play_step_human in this class. If you look below it, you will now see a new, method called play_step_ai.
+We will implement the AI using a neural network. There are several kinds of networks we can use for this task. We will use a simple form of network called a Feedforward nural network.
 
-The AI will later decide on a step, and this step can be one of three. It can decide to keep on going in the direction it is already heading, it can turn right, or it can turn left. When the AI has decided on its move, it will be passed to this new method as action.
+It means that we construct a network where the nodes never form a circle. We pass in data in one end, into something that is called input nodes. The passes through the network layers and gives us an output at the other end.
 
-#####The Action
-The action passed to the method will be in the form of a list containing three integers. The integers in the list can be either 0 or 1.
-The location of a 1 in this list will tell us the desired move. The actions is as follows:
+We will form a network consisting of three layers. 
 
-[1, 0, 0] -> Keep on going in the current direction
-[0, 1, 0] -> Turn right
-[0, 0, 1] -> Turn left
+The input layer is formed by 11 nodes. The reason there are 11 nodes is that we will use an input that conosist of 11 values. 
+We will soon come to why we ended up with 11 values.
 
-#####Set the Direction of the Snake
-If you look what happens in the human play method when a user press any of the arrow keys you will see that the snake direction is controlled by setting self.direction to one of the values in the Direction enum.
+The output layer will consist of three nodes. The reason for this is that what we need from the AI is an action, and as we saw in the previsous branch play_step_ai wants an input consisting och three values.
 
-The differens between how a human is controlling the snake and how the AI does it is that the action we are getting is either keep on going, go left, or go right and is not matched to the directions given when a human is pressing any of the arrow keys.
+This is an illustration of a feedforward network.
 
-To be able to control the snake we will need to translate the action into a direction. The problem here is that the direction is dependent of the current direction of the snake.
+![Feedforward Neural Network](./img/Feed_forward_neural_net.gif)
 
-If the snake is heading to the right and the action is turn right the new direction will be down. It the snake, on the other hand is going left and we ask it to turn right, the new direction will be up.
+As we can see, the information moves only in one direction. We can also see that betwen the input and output layer is a hidden layer. We can exepriment with the number of nodes in this layer to find something that works for our task. We are not limited to just three layers either, we can, if we want, add more hidden layers to our network.
 
-Check the table below to see how the current direction and action is translated into a new direction.
+###Forming the Input Data
+The data that we will feed the network with is some information about the state of the game after each step. 
 
-| Current Direction | Action | New Direction |
-|---|---|---|
-| Left | Right | Down |
-| Left | Left | Up |
-| Down | Right | Right |
-| Down | Left | Left |
-| Right | Right | Up |
-| Right | Left | Down |
-| Up | Right | Left |
-| Up | Left | Right |
+This will consist of 11 zeros and ones. We will not tell the network the meaning of these values. It will need to figure that out by itself.
 
-We will do this translation by the use of a list containing all four possible directions in the order Right, Down, Left, and Up. That is a clockwise rotation start at the right direction. 
+The input data will consist of three parts.
 
-The first thing we will do is to extract the index in this list of the current direction of the snake.
+#####Danger Path
+The first three values represents if a move in a given direction will result in death of the snake.
 
-The action list is giving us two possible moves we need to consider as the keep on going action actually means do nothing.
+A 1 represents death if we move in that direction and 0 that this move is safe.
 
-We will compare our action array to either a right or a left turn. 
+If the snake is moving to the left and it's head is just one tile from the left wall, a move straight ahead would mean death. So if there is a 1 in the first location it represent that we will die if we move forward in the direction we currently moving in.
 
-We now know the two things we need to know, the current direction and if we want to turn left or right. The only thing we need to do to get the new direction if to add 1 to the index of the current direction variable, if the action tells us to turn right, and subtract 1 from the index variable if we want to turn left.
+The second value will tell us the result of right turn, and the third value the result of a left turn.
 
-To make sure we stay within the clockwise direction list with our new index we perform a modulus by the length of the list.
+Here are some combinations of these first three values as an example:
 
-We can now use this new index to look up our new direction from the list of directions.
+0, 0, 0 = All directions are safe
+1, 0, 0 = Right and left are safe but straight ahead will kill the snake
+1, 0, 1 = Straight and a left turn will kill the snake, but a right turn is safe
+1, 1, 0, = Straight and a right turn will kill the snake, but moving to the left is safe
+1, 1, 1 = You are screwed
 
-#####Move the Snake
-After that we can call the self._move method to make the snake move one step in the new direction.
+#####Current Direction
+The next four values represents the current direction.
+Only one of these can be 1 at any given time. The order of the values are:
 
-#####Calculate the Reward
-As we will be using Reinforcement Learn to thrain the AI we will need to have a reward for each move.
+left, right, up, down
 
-The reward is calculated with positive values if the snake does something we think is a good move, and a negative value if it does something bad.
+so the combination
 
-To know how we shoudl reward the AI for this move we must first evaluate the result of the move.
+0, 1, 0, 0
 
-It is possible that the move resulted in a collision. That is a bad outcome, so the reward for the last move will be -10.
+mean that the snake is traveling to the right
 
-Sometimes the snake will end up in an enless loop, or just move around doing anything useful. We will consider this a useless run, kill the snake and give a reward of -5. We keep track of how many iterations (that is actually how many times we visited this method) since we last got a positive reward. If this value is larger than 100 * the length of the snake it is time to kill the snake and start over. 
+0, 0, 1, 0
 
-We take the snakes lenght into consideration here as a successful run with a long snake mean that the snake must take a longer path to reach the fruit, so it needs more steps before it gets rewarded.
+mean that the snake is heading up.
 
-The only time the AI gets a positive reward is when it reaches the fruit. In this case we will reward the AI with a positive 10.
+#####Fruit Location
+The last 4 values represents where the fruit is located in relation to the head of the snake. It is not an exact location. The first two values tells us if the fruit is to the left or to the right. The last two values tells us if the fruit is above or below us.
 
-We can play around with this positive reward to see if it improves training of the AI.
+Some examples
 
-One option would to to, besides the 10 point reward for reaching the fruit, give it another positive reward for moving in the right direction. 
+1, 0, 0, 1 = The fruit is to the left and below us
+0, 0, 1, 0 = We are in the same column as the fruit but it is above us
+0, 1, 0, 0 = We are on the same row as the fruit but it is to our right.
 
-We could for example calculate the Eucledian distance between the snakes head and the fruit. We could use this value to calculate a reward in the range of, for example 0.1 and 5.0. A higher value mean it is closer to the fruit. This could be a way for the AI to learn to head for the fruit faster than if we did not give it this reward. 
+######All Values Together
+If we put all these values together we can get something like this
 
-If you try this remember to give it a larger reward when it actually reaches the fruit, and also remeber not to reset the iterations_since_reward counter for this reward as it will reset that counter each step. We only want to reset it when the snake gets the fruit.
+[1, 1, 0,
+ 0, 1, 0, 0,
+ 1, 0, 1, 0]
 
-#####What the Method Returns
-This method returns three values. The first one is a boolean indicating of we should end the game or not. False mean we survived, keep on going and True is an indication that we are dead.
+ As we can see, we got 11 values. These can be interpreted as:
 
-The scond value returned by the method is the reward for this move, and the last value is the current score.
+ You will die if you move straight ahead or turn to the right, but turning left is OK. (First three values)
 
-#####Test the Code
-To test our new method, run ai_snake.py. It contains some hard coded actions that we send to the play_step_ai method, to see it in action.
+ You are currently moving in the right direction. (Next four values)
 
-#####Next Step
-Now we are done with the boilerplate code for this project. Checkout the **ai** branch, and we are ready to code some cool stuff.
+ The fruit is to your left and above you. (The last four values)
+
+ We know the meaning of these values, but the AI don't.
+
+ ####Long and Short Memory
+ The AI will also work with something that is called a long and short memory.
+
+ The short memory is just the last step is took. The long memory is a number of previsous steps, up to a limit that we set. We will use up to a maximum of 1,000 steps prior to where we are now.
+
+ The network will "replay" the last step it took to evaluate the outcome of it's action. We will tell it the outcome of that move (death or no death) and the reward we got from that move.
+
+ We will also store each move and its outcome in the long memory.
+
+ When the snake dies it will replay all moves in the long memory and learn from it.
