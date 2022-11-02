@@ -1,14 +1,14 @@
-##Snake Game
+## Snake Game
 
-####The step1 Branch
+#### The step1 Branch
 The first thing we need to do is to setup the game to be able to be played by the AI.
 
-####Additions to the SnakeGame Class
+#### Additions to the SnakeGame Class
 Open the game.py file. We already have a method called play_step_human in this class. If you look below it, you will now see a new, method called play_step_ai.
 
 The AI will later decide on a step, and this step can be one of three. It can decide to keep on going in the direction it is already heading, it can turn right, or it can turn left. When the AI has decided on its move, it will be passed to this new method as action.
 
-#####The Action
+##### The Action
 The action passed to the method will be in the form of a list containing three integers. The integers in the list can be either 0 or 1.
 The location of a 1 in this list will tell us the desired move. The actions is as follows:
 
@@ -16,7 +16,7 @@ The location of a 1 in this list will tell us the desired move. The actions is a
 [0, 1, 0] -> Turn right
 [0, 0, 1] -> Turn left
 
-#####Set the Direction of the Snake
+##### Set the Direction of the Snake
 If you look what happens in the human play method when a user press any of the arrow keys you will see that the snake direction is controlled by setting self.direction to one of the values in the Direction enum.
 
 The differens between how a human is controlling the snake and how the AI does it is that the action we are getting is either keep on going, go left, or go right and is not matched to the directions given when a human is pressing any of the arrow keys.
@@ -52,10 +52,10 @@ To make sure we stay within the clockwise direction list with our new index we p
 
 We can now use this new index to look up our new direction from the list of directions.
 
-#####Move the Snake
+##### Move the Snake
 After that we can call the self._move method to make the snake move one step in the new direction.
 
-#####Calculate the Reward
+##### Calculate the Reward
 As we will be using Reinforcement Learn to thrain the AI we will need to have a reward for each move.
 
 The reward is calculated with positive values if the snake does something we think is a good move, and a negative value if it does something bad.
@@ -78,13 +78,13 @@ We could for example calculate the Eucledian distance between the snakes head an
 
 If you try this remember to give it a larger reward when it actually reaches the fruit, and also remeber not to reset the iterations_since_reward counter for this reward as it will reset that counter each step. We only want to reset it when the snake gets the fruit.
 
-#####What the Method Returns
+##### What the Method Returns
 This method returns three values. The first one is a boolean indicating of we should end the game or not. False mean we survived, keep on going and True is an indication that we are dead.
 
 The scond value returned by the method is the reward for this move, and the last value is the current score.
 
-#####Test the Code
+##### Test the Code
 To test our new method, run ai_snake.py. It contains some hard coded actions that we send to the play_step_ai method, to see it in action.
 
-#####Next Step
+##### Next Step
 Now we are done with the boilerplate code for this project. Checkout the **ai** branch, and we are ready to code some cool stuff.
