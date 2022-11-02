@@ -1,6 +1,6 @@
-##Snake Game
+## Snake Game
 
-####Coding of the AI
+#### Coding of the AI
 Now we can get started with the coding the actual AI.
 
 We will implement the AI using a neural network. There are several kinds of networks we can use for this task. We will use a simple form of network called a Feedforward nural network.
@@ -20,14 +20,14 @@ This is an illustration of a feedforward network.
 
 As we can see, the information moves only in one direction. We can also see that betwen the input and output layer is a hidden layer. We can exepriment with the number of nodes in this layer to find something that works for our task. We are not limited to just three layers either, we can, if we want, add more hidden layers to our network.
 
-###Forming the Input Data
+### Forming the Input Data
 The data that we will feed the network with is some information about the state of the game after each step. 
 
 This will consist of 11 zeros and ones. We will not tell the network the meaning of these values. It will need to figure that out by itself.
 
 The input data will consist of three parts.
 
-#####Danger Path
+##### Danger Path
 The first three values represents if a move in a given direction will result in death of the snake.
 
 A 1 represents death if we move in that direction and 0 that this move is safe.
@@ -44,7 +44,7 @@ Here are some combinations of these first three values as an example:
 1, 1, 0, = Straight and a right turn will kill the snake, but moving to the left is safe
 1, 1, 1 = You are screwed
 
-#####Current Direction
+##### Current Direction
 The next four values represents the current direction.
 Only one of these can be 1 at any given time. The order of the values are:
 
@@ -60,7 +60,7 @@ mean that the snake is traveling to the right
 
 mean that the snake is heading up.
 
-#####Fruit Location
+##### Fruit Location
 The last 4 values represents where the fruit is located in relation to the head of the snake. It is not an exact location. The first two values tells us if the fruit is to the left or to the right. The last two values tells us if the fruit is above or below us.
 
 Some examples
@@ -69,7 +69,7 @@ Some examples
 0, 0, 1, 0 = We are in the same column as the fruit but it is above us
 0, 1, 0, 0 = We are on the same row as the fruit but it is to our right.
 
-######All Values Together
+###### All Values Together
 If we put all these values together we can get something like this
 
 [1, 1, 0,
@@ -86,7 +86,7 @@ If we put all these values together we can get something like this
 
  We know the meaning of these values, but the AI don't.
 
- ####Long and Short Memory
+ #### Long and Short Memory
  The AI will also work with something that is called a long and short memory.
 
  The short memory is just the last step is took. The long memory is a number of previsous steps, up to a limit that we set. We will use up to a maximum of 1,000 steps prior to where we are now.
