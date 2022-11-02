@@ -38,10 +38,10 @@ The second value will tell us the result of right turn, and the third value the 
 
 Here are some combinations of these first three values as an example:
 
-0, 0, 0 = All directions are safe
-1, 0, 0 = Right and left are safe but straight ahead will kill the snake
-1, 0, 1 = Straight and a left turn will kill the snake, but a right turn is safe
-1, 1, 0, = Straight and a right turn will kill the snake, but moving to the left is safe
+0, 0, 0 = All directions are safe<br/>
+1, 0, 0 = Right and left are safe but straight ahead will kill the snake<br/>
+1, 0, 1 = Straight and a left turn will kill the snake, but a right turn is safe<br/>
+1, 1, 0, = Straight and a right turn will kill the snake, but moving to the left is safe<br/>
 1, 1, 1 = You are screwed
 
 ##### Current Direction
@@ -65,16 +65,16 @@ The last 4 values represents where the fruit is located in relation to the head 
 
 Some examples
 
-1, 0, 0, 1 = The fruit is to the left and below us
-0, 0, 1, 0 = We are in the same column as the fruit but it is above us
-0, 1, 0, 0 = We are on the same row as the fruit but it is to our right.
+1, 0, 0, 1 = The fruit is to the left and below us<br/>
+0, 0, 1, 0 = We are in the same column as the fruit but it is above us<br/>
+0, 1, 0, 0 = We are on the same row as the fruit but it is to our right.<br/>
 
 ###### All Values Together
 If we put all these values together we can get something like this
 
-`[1, 1, 0,
- 0, 1, 0, 0,
- 1, 0, 1, 0]`
+[1, 1, 0,<br/>
+ 0, 1, 0, 0,<br/>
+ 1, 0, 1, 0]
 
  As we can see, we got 11 values. These can be interpreted as:
 
