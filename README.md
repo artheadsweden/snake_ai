@@ -245,3 +245,6 @@ But after about 90 games we can see a great improvement.
 ![First Snake](./img/snake2.gif)
 
 It is still not perfect, and it will never be. The reason for this is that the AI only knows about its head and the location of the fruit, but is totally unaware of its body. After the first 90-100 games the AI will be as good as it can ever be, and there will be only one way it can die and that is that it will trap its head with its body and have no way out.
+
+### The Final Game
+In this branch you will find the new files (model.py for the network model code, agent.py that will drive the network) with some method that are empty. There is also a plot.py that contains some code that we can use to plot our results to a graph. You can either try to code these yourself, or if you are lazy you can checkout the **final_ai** branch to get a working example of how this can be done.
