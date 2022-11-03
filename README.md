@@ -21,7 +21,7 @@ This is an illustration of a feedforward network.
 As we can see, the information moves only in one direction. We can also see that betwen the input and output layer is a hidden layer. We can exepriment with the number of nodes in this layer to find something that works for our task. We are not limited to just three layers either, we can, if we want, add more hidden layers to our network.
 
 ### Forming the Input Data
-The data that we will feed the network with is some information about the state of the game after each step. 
+The data that we feed the network with is the state of the game after each step. 
 
 This will consist of 11 zeros and ones. We will not tell the network the meaning of these values. It will need to figure that out by itself.
 
@@ -89,13 +89,13 @@ If we put all these values together we can get something like this
  #### Long and Short Memory
  The AI will also work with something that is called a long and short memory.
 
- The short memory is just the last step is took. The long memory is a number of previsous steps, up to a limit that we set. We will use up to a maximum of 1,000 steps prior to where we are now.
+ The short memory is just the last step it took. The long memory is a number of previsous steps, up to a limit that we set. We will use up to a maximum of 100,000 steps prior to where we are now.
 
  The network will "replay" the last step it took to evaluate the outcome of it's action. We will tell it the outcome of that move (death or no death) and the reward we got from that move.
 
  We will also store each move and its outcome in the long memory.
 
- When the snake dies it will replay all moves in the long memory and learn from it.
+ When the snake dies it will replay a random selection of 1,000 previsous moves in the long memory (if we have that many in the long memory, if not it replays all) and learn from it.
 
  ### The AI Game Loop
  If we explore the game loop for the AI player we will get a better idea what is happening.
@@ -105,21 +105,21 @@ If we put all these values together we can get something like this
  
  The state is represented by the elven values we saw above that tells us what will happen if we take one step in the direction we are heading, if we turn right or left, the current direction, and the position of the fruit in relation to the snake's head.
 
-  #### 2. Decide the Next Move
+  ##### 2. Decide the Next Move
   Next, we will get the next move. This will done in one of two ways. 
 
   To make the model envolve in a good way we will need to give it the abillity to mutate. This is done by giving it a chance to do a totally random move.
 
-  The chance of this random move is controlled by something that is called the epsilon. We are using a constant value and subtract the number of games played from it. If a random value is below the epsilon we will make a totally random move.
+  The chance of this random move is controlled by something that is called the epsilon. The epsilon is a constant value and we subtract the number of games played from it. If a random value is below the epsilon - the number of games played, we will make a totally random move.
 
   In our case we will use 80 as our epsilon constant, meaning that the first 80 games will have an element of randomness in it. After 80 games all moves are decided by the AI.
 
   ###### The AI Move
   When we want the AI to decide on it's move we will do three things. 
 
-  First, we will transform the state, that is a Python list of integers, into a tensor.
+  First, we will transform the state, that is the Python list of 11 integers we saw earlier, into a tensor.
 
-  There is nothing magical about a tensor. It is a n-dimensional array, but it is in a form that works with our next step, predicting the step.
+  There is nothing magical about a tensor. It is a n-dimensional array, but it is in a form that works with our next step, predicting the snakes next move.
 
   The prediction is done by calling the model, passing the state tensor.
 
@@ -147,7 +147,7 @@ After passing that data into the last layer of our network we will get a tensor 
 
 `[0.0932, -0.0117, 0.1034]`
 
-We get three values as we asked for an output layer of size 3.
+We get three values as we therefor created an output layer of size 3.
 
 We will use the index to the largest of these values to decide on the move.
 
@@ -168,7 +168,7 @@ When that move is over we need to evaluate the outcome.
 #### 4. Training the AI
 Not much training is done during a game. The main part is done after a game is finished.
 
-But to be able to to any training we need to gather some data. We already have some of it, the state of the game before the move was made, the return values from play_step_ai (that was if we survived that move or not, the reward we got from that move, and the current score). 
+But to be able to do any training we need to gather some data. We already have some of it, the state of the game before the move was made, the return values from play_step_ai (that was if we survived that move or not, the reward we got from that move, the current score, and if the snake died or not). 
 
 But we need to see what the state of the game is after the move too. We do that by gathering the same 11 values we got before the move.
 
@@ -217,15 +217,15 @@ To understand if our prediction is a good or bad one, we need the help of a loss
 
 The loss function we will use is called Mean Squared Error (MSE). 
 
-Before we calculate the loss, we need to apply an optimizer function. The optimzer function will use the gradient information in our network. To get a better understanding of what gradients are and how they work we can again turn to Jason Brownlee and his [blog](https://machinelearningmastery.com/gradient-in-machine-learning/).
+Before we calculate the loss, we need to run an optimizer function. The optimzer function will use the gradient information in our network. To get a better understanding of what gradients are and how they work we can again turn to Jason Brownlee and his [blog](https://machinelearningmastery.com/gradient-in-machine-learning/).
 
-We have a wide selection of optimizer functions to choose from, and here we are using the Adam Optimization Algorithm. Want to know what that is? Well here Jason again, with another post on [that topic](https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/).
+We have a wide selection of optimizer functions to choose from, and here we are using the Adam Optimization Algorithm. Want to know what that is? Well here is Jason again, with another post on [that topic](https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/).
 
 We can now apply our loss function to see how we performed. We are using the MSE algorithm. In short, what it does, is that meassure the average of squares of the errors - that is, the average squared difference between the estimated value and the actual value. 
 
 To take a very simplified example. If I predict the temperature for to tomorrow to be 12 ℃ and the actual temperature turns out to be 15 ℃ the error is 3. If we have a number of predictions we calculate the the average of these errors, and that will give us an indication of how well we are doing.
 
-As this is a feedforward neural network we will then do something that is known as backpropagation. A very simplyfied explanation of what this is would be to say that this is the step that computes the gradients (in something that is known as the weight space) of the network. This is a step we need to perform, even if we not fully understand it.
+As this is a feedforward neural network we will then do something that is known as backpropagation. A very simplyfied explanation of what this is would be to say that this is the step that computes the gradients (in something that is known as the weight space) of the network. This is a step we need to perform, even if we not fully understand it. But it makes the network perform better in the following step.
 
 We can now let the optimizer do the optimization of the network, and we do that by asking the optimizer to take a step.
 
@@ -247,5 +247,5 @@ But after about 90 games we can see a great improvement.
 It is still not perfect, and it will never be. The reason for this is that the AI only knows about its head and the location of the fruit, but is totally unaware of its body. After the first 90-100 games the AI will be as good as it can ever be, and there will be only one way it can die and that is that it will trap its head with its body and have no way out.
 
 ### The Final Game
-In this branch you will find the new files (model.py for the network model code, agent.py that will drive the network) with some method that are empty. There is also a plot.py that contains some code that we can use to plot our results to a graph. You can either try to code these yourself, or if you are lazy you can checkout the **final_ai** branch to get a working example of how this can be done.
+In this branch you will find the new files (model.py for the network model code, agent.py that will drive the network) with some methods that are empty. There is also a plot.py that contains some code that we can use to plot our results to a graph. You can either try to code these yourself, or if you are lazy you can checkout the **final_ai** branch to get a working example of how this can be done.
 
