@@ -2,7 +2,7 @@
 This game has two modes.
 
 #### Human Mode
-One is a normal snake game that you can play. You can start it by executing the human_snake.py file located in the src folder. This mode is the only thing that works in the main branch.
+This is a normal snake game that you can play. You can start it by executing the human_snake.py file located in the src folder. This mode is the only thing that works in the main branch.
 
 The game is implemented using pygame.
 
